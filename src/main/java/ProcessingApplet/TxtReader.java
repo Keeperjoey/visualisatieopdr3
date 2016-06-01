@@ -47,7 +47,7 @@ public class TxtReader {
             float sumX = Math.abs(schoolX - holdCoordinate.x);
             float sumY = Math.abs(schoolY - holdCoordinate.y);
 
-            if (sumX < 5000 && sumY < 5000){
+            if (sumX < 1000 && sumY < 1000){
             coordinate.add(holdCoordinate);
 
 //            if (minX > xCoordinate) {

@@ -76,11 +76,11 @@ public class ProcessingApplet extends PApplet {
         cp5.addSlider("ChangeForOtherDistance")
                 .setPosition(100, 140)
                 .setWidth(300)
-                .setRange(500, 5000)
+                .setRange(500, 1000)
                 .setNumberOfTickMarks(5)
                 .onChange(cb)
                 .setHeight(50)
-                .setValue(5000f);
+                .setValue(500f);
 
         cp5.addButton("Reset")
                 .setValue(0)
@@ -186,8 +186,12 @@ public class ProcessingApplet extends PApplet {
 
             }
             
+            //remove later
             fill(color(255,0,0));
+            //remove later red dot in middle
             rect(windowWidth/2, windowHeight/2, 30, 30);
+            //
+            
             if (pause == false ) {
                 waterLevel = waterLevel + 0.15f;
                 SimpleDateFormat df = new SimpleDateFormat("HH:mm");
