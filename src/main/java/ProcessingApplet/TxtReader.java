@@ -22,11 +22,14 @@ public class TxtReader {
     public static ArrayList coordinate;
 
     public static float minX = Float.MAX_VALUE;
-    public static float maxX = Float.MAX_VALUE;
+    public static float maxX = Float.MIN_VALUE;
     public static float minY = Float.MAX_VALUE;
-    public static float maxY = Float.MAX_VALUE;
+    public static float maxY = Float.MIN_VALUE;
     public static float minZ = Float.MAX_VALUE;
-    public static float maxZ = Float.MAX_VALUE;
+    public static float maxZ = Float.MIN_VALUE;
+    public static float schoolX = 90347f;
+    public static float schoolY = 436960f;
+    
 
     public static ArrayList<PVector> parseTxt() throws FileNotFoundException, IOException {
         BufferedReader br = new BufferedReader(new FileReader(new File("rotterdamopendata_hoogtebestandtotaal_oost.csv")));
@@ -46,7 +49,11 @@ public class TxtReader {
             float zCoordinate = Float.parseFloat(splitLine[2]);
 
             PVector holdCoordinate = new PVector(xCoordinate, yCoordinate, zCoordinate);
+            
+            float sumX = Math.abs(schoolX - holdCoordinate.x);
+            float sumY = Math.abs(schoolY - holdCoordinate.y);
 
+            if (sumX < 1000 && sumY < 1000){
             coordinate.add(holdCoordinate);
 
             if (minX > xCoordinate) {
@@ -72,7 +79,7 @@ public class TxtReader {
             if (maxZ < zCoordinate) {
                 maxZ = zCoordinate;
             }
-
+          }
         }
 
         return coordinate;
