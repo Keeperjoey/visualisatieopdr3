@@ -21,13 +21,9 @@ public class TxtReader {
 
     public static ArrayList coordinate;
 
-    public static float minX = Float.MAX_VALUE;
-    public static float maxX = Float.MIN_VALUE;
-    public static float minY = Float.MAX_VALUE;
-    public static float maxY = Float.MIN_VALUE;
     public static float minZ = Float.MAX_VALUE;
     public static float maxZ = Float.MIN_VALUE;
-    public static float schoolX = 90347f;
+    public static float schoolX = 90547f;
     public static float schoolY = 436960f;
     
 
@@ -44,37 +40,35 @@ public class TxtReader {
         while ((txtLine = br.readLine()) != null) {
             String[] splitLine = txtLine.split(",");
 
-            float xCoordinate = Float.parseFloat(splitLine[0]);
-            float yCoordinate = Float.parseFloat(splitLine[1]);
             float zCoordinate = Float.parseFloat(splitLine[2]);
 
-            PVector holdCoordinate = new PVector(xCoordinate, yCoordinate, zCoordinate);
+            PVector holdCoordinate = new PVector(Float.parseFloat(splitLine[0]), Float.parseFloat(splitLine[1]), zCoordinate);
             
             float sumX = Math.abs(schoolX - holdCoordinate.x);
             float sumY = Math.abs(schoolY - holdCoordinate.y);
 
-            if (sumX < 1000 && sumY < 1000){
+            if (sumX < 5000 && sumY < 5000){
             coordinate.add(holdCoordinate);
 
-            if (minX > xCoordinate) {
-                minX = xCoordinate;
-            }
-
-            if (minY > yCoordinate) {
-                minY = yCoordinate;
-            }
-
+//            if (minX > xCoordinate) {
+//                minX = xCoordinate;
+//            }
+//
+//            if (minY > yCoordinate) {
+//                minY = yCoordinate;
+//            }
+//
             if (minZ > zCoordinate) {
                 minZ = zCoordinate;
             }
-
-            if (maxX < xCoordinate) {
-                maxX = xCoordinate;
-            }
-
-            if (maxY < yCoordinate) {
-                maxY = yCoordinate;
-            }
+//
+//            if (maxX < xCoordinate) {
+//                maxX = xCoordinate;
+//            }
+//
+//            if (maxY < yCoordinate) {
+//                maxY = yCoordinate;
+//            }
 
             if (maxZ < zCoordinate) {
                 maxZ = zCoordinate;
@@ -84,9 +78,4 @@ public class TxtReader {
 
         return coordinate;
     }
-
-    public static String commasToPeriods(String stringWithCommas) {
-        return stringWithCommas.replaceAll(",", ".");
-    }
-
 }
