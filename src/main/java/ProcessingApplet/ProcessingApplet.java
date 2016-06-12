@@ -11,6 +11,8 @@ import controlP5.CallbackEvent;
 import controlP5.CallbackListener;
 import controlP5.ControlEvent;
 import controlP5.ControlP5;
+import controlP5.ControlP5Constants;
+import controlP5.Knob;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -28,23 +30,23 @@ import processing.core.PVector;
  */
 public class ProcessingApplet extends PApplet {
 
-    static ArrayList<PVector> parseResults;
+    static ArrayList<PVector> parseResults;         //Arraylist of all the x,y,z 
 
     final static int windowHeight = 1100;           //window height
     final static int windowWidth = 1100;            //window width
-    static float waterLevel = -6f;
-    boolean firstLoop = true;
-    boolean pause = false;
-    ControlP5 cp5;
-    String myTime = "00:00";
-    float waterLevelOld = Float.MIN_VALUE;
-    static CallbackListener cb;
+    static float waterLevel = -100f;                //initial waterlevel
+    boolean firstLoop = true;                       //to see what part has to be drawn again
+    boolean pause = false;                          //see if pauze is pressed
+    ControlP5 cp5;                                  //for the gui libary
+    String timePassed = "01 00:00";                    //The time water started rising
+    float waterLevelOld = Float.MIN_VALUE;          //to only draw the new dots ( speeds up things)
+    static CallbackListener cb;                     // An onclick for the sliderbar 
 
     public static void main(String[] args) {
 
         try {
+            //Calls TxtReader functions parseTxt
             parseResults = TxtReader.parseTxt();
-            //   count = TxtReader.minZ;
 
         } catch (IOException ex) {
             Logger.getLogger(ProcessingApplet.class.getName()).log(Level.SEVERE, null, ex);
@@ -57,12 +59,15 @@ public class ProcessingApplet extends PApplet {
     @Override
     public void setup() {
         size(windowWidth, windowHeight);
+        //fill the map intialy with a brownish color
+        reset();
 
-        // slider
+        //initialize the controlP5 library
         cp5 = new ControlP5(this);
 
         //Callbacklistener for slider if you click slider somewhere it well call reset
         cb = new CallbackListener() {
+            @Override
             public void controlEvent(CallbackEvent theEvent) {
                 switch (theEvent.getAction()) {
                     case (ControlP5.ACTION_CLICK):
@@ -73,34 +78,48 @@ public class ProcessingApplet extends PApplet {
             }
         };
 
+        //add slider with an onChange listeren
         cp5.addSlider("ChangeForOtherDistance")
                 .setPosition(100, 140)
                 .setWidth(300)
-                .setRange(500, 1000)
-                .setNumberOfTickMarks(5)
+                .setRange(250, 500)
                 .onChange(cb)
                 .setHeight(50)
                 .setValue(500f);
 
+        // add reset button
         cp5.addButton("Reset")
                 .setValue(0)
                 .setPosition(100, 50)
                 .setSize(150, 80)
                 .setValueLabel("Reset/Redraw for distance");
 
+        //add pauze/play button
         cp5.addButton("Pause/Play")
                 .setValue(0)
                 .setPosition(250, 50)
                 .setSize(150, 80);
-
+        //adds screenshot button
         cp5.addButton("Screenshot")
                 .setValue(0)
                 .setPosition(400, 50)
                 .setSize(150, 80);
 
+        //add wheel for the waterlevel
+        cp5.addKnob("waterLevelWheel")
+                .setValue(5)
+                .setPosition(750, 50)
+                .setSize(100, 100)
+                .setRadius(50)
+                .setRange(TxtReader.minZ, 20);
+
+//        cp5.addTextfield("Time")
+//                .setPosition(850, 50)
+//                .setText("Time = " + timePassed);
 //         And From your main() method or any other method
     }
 
+    //Eventlistener ( if the event is passed to something )
     public void controlEvent(ControlEvent theEvent) {
         if ("ChangeForOtherDistance".equals(theEvent.getController().getName())) {
             reset();
@@ -118,9 +137,15 @@ public class ProcessingApplet extends PApplet {
     }
 
     public void reset() {
+        //draw brownish color over the map so it looks like it's first draw
+        fill(color(0, 20, 200));
+        rect(0, 0, 1100, 1100);
+        //Sets firstLoop to true so it's starts drawing all again
         firstLoop = true;
+        //Set waterLevel to the minimum Z value in the file
         waterLevel = TxtReader.minZ;
-        myTime = "00:00";
+        //Set timePassed to 0 
+        timePassed = "01 00:00";
     }
 
     public void pause() {
@@ -140,8 +165,8 @@ public class ProcessingApplet extends PApplet {
     @Override
     public void draw() {
 
-        fill(255, 0, 0);
-
+        //fill(255, 0, 0);
+        if (waterLevel < 20)
         drawTheMap();
         //  intializeButtons();
 
@@ -160,18 +185,18 @@ public class ProcessingApplet extends PApplet {
 
             for (PVector results : parseResults) {
                 float mappedX = map(results.x, minX, maxX, 0, windowWidth);
-                float mappedY = map(results.y, minY, maxY, windowHeight, 0 );
+                float mappedY = map(results.y, minY, maxY, windowHeight, 0);
                 float mappedZ = map(results.z, minZ, maxZ, 0, 255);
 
                 stroke(color(mappedZ, mappedZ, 20));
                 fill(color(mappedZ, mappedZ, 20));
                 firstLoop = false;
 
-                rect(mappedX, mappedY, 5, 5);
+                rect(mappedX, mappedY, 4, 4);
             }
         } else {
             for (PVector results : parseResults) {
-
+                cp5.getController("waterLevelWheel").setValue(waterLevel);
                 float mappedX = map(results.x, minX, maxX, 0, windowWidth);
                 float mappedY = map(results.y, minY, maxY, windowHeight, 0);
                 //float mappedZ = map(results.z, minZ, maxZ, 0, 255);
@@ -180,42 +205,41 @@ public class ProcessingApplet extends PApplet {
                     stroke(color(0, 0, 255));
                     fill(color(0, 0, 255));
 
-                    rect(mappedX, mappedY, 5, 5);
+                    rect(mappedX, mappedY, 4, 4);
                 }
                 waterLevelOld = waterLevel;
 
             }
-            
-            //remove later
-            fill(color(255,0,0));
-            //remove later red dot in middle
-            rect(windowWidth/2, windowHeight/2, 30, 30);
-            //
-            
-            if (pause == false ) {
+
+            if (pause == false) {
                 waterLevel = waterLevel + 0.15f;
-                SimpleDateFormat df = new SimpleDateFormat("HH:mm");
-                Date d;
-                try {
-                    d = df.parse(myTime);
-                    Calendar cal = Calendar.getInstance();
-                    cal.setTime(d);
-                    cal.add(Calendar.MINUTE, 9);
-                    myTime = df.format(cal.getTime());
-                    fill(color(0));
-                    rect(960, 50, 200, 80);
-                    fill(color(255));
-                    text("Time: " + myTime, 1000, 80);
-                    text("WaterLvl: ~ " + Math.round(waterLevel), 1000, 100);
-
-                } catch (ParseException e) {
-
-                }
-
+                timeAndDaysPassed();
             }
+
         }
     }
 
+    void timeAndDaysPassed() {
+        SimpleDateFormat df = new SimpleDateFormat("dd HH:mm");
+        Date d;
+        try {
+            d = df.parse(timePassed);
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(d);
+            cal.add(Calendar.MINUTE, 9);
+            timePassed = df.format(cal.getTime());
+            fill(color(0));
+            rect(960, 50, 200, 80);
+            fill(color(255));
+            text("Days: " + (cal.get(Calendar.DATE) - 1), 1000, 80);
+            text("Time: " + cal.get(Calendar.HOUR_OF_DAY) + ":" + cal.get(Calendar.MINUTE), 1000, 100);
+            
+        } catch (ParseException e) {
+
+        }
+
+    }
+//to Prove we could do it without liberary but it's better now
 //    void intializeButtons() {
 ////        float x = 100;
 ////        float y = 50;
@@ -257,5 +281,5 @@ public class ProcessingApplet extends PApplet {
 //
 ////        }
 //    }
-    // noLoop();
+// noLoop();
 }

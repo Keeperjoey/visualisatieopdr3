@@ -23,8 +23,8 @@ public class TxtReader {
 
     public static float minZ = Float.MAX_VALUE;
     public static float maxZ = Float.MIN_VALUE;
-    public static float schoolX = 90547f;
-    public static float schoolY = 436960f;
+    public static float schoolX = 92865f;
+    public static float schoolY = 436920f;
     
 
     public static ArrayList<PVector> parseTxt() throws FileNotFoundException, IOException {
@@ -47,34 +47,19 @@ public class TxtReader {
             float sumX = Math.abs(schoolX - holdCoordinate.x);
             float sumY = Math.abs(schoolY - holdCoordinate.y);
 
-            if (sumX < 1000 && sumY < 1000){
+            if (sumX < 500 && sumY < 500){
             coordinate.add(holdCoordinate);
 
-//            if (minX > xCoordinate) {
-//                minX = xCoordinate;
-//            }
-//
-//            if (minY > yCoordinate) {
-//                minY = yCoordinate;
-//            }
-//
             if (minZ > zCoordinate) {
                 minZ = zCoordinate;
             }
-//
-//            if (maxX < xCoordinate) {
-//                maxX = xCoordinate;
-//            }
-//
-//            if (maxY < yCoordinate) {
-//                maxY = yCoordinate;
-//            }
 
             if (maxZ < zCoordinate) {
                 maxZ = zCoordinate;
             }
           }
         }
+        br.close();
 
         return coordinate;
     }
